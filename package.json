@@ -8,11 +8,11 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && cd server && npm run build",
+    "build": "tsc && vite build && mkdir -p server/dist && cp -r dist server/dist/public",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "start": "cd server && npm run start:prod",
-    "postinstall": "cd server && npm install"
+    "start": "node server/src/server.js",
+    "postinstall": "if [ -d \"server\" ]; then cd server && npm install; fi"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.1.2",

@@ -1,47 +1,25 @@
-# Frontend build stage
-FROM node:20-alpine as frontend-build
+FROM node:18-alpine
 
+# Set working directory
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
+
+# Copy server directory 
+COPY server ./server/
+
+# Install root dependencies
 RUN npm install
 
+# Copy the rest of the application
 COPY . .
+
+# Build the frontend
 RUN npm run build
 
-# Backend build stage
-FROM node:20-alpine as backend-build
+# Expose port
+EXPOSE 5001
 
-WORKDIR /app
-
-# Copy frontend build
-COPY --from=frontend-build /app/dist ./dist
-
-# Build backend
-WORKDIR /app/server
-
-COPY server/package*.json ./
-RUN npm install
-
-COPY server ./
-RUN npm run build
-
-# Production stage
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Copy backend build with frontend included
-COPY --from=backend-build /app/server/dist ./dist
-COPY --from=backend-build /app/server/package*.json ./
-
-# Install production dependencies
-RUN npm install --production
-
-# Set environment variables
-ENV PORT=3000
-ENV NODE_ENV=production
-
-EXPOSE 3000
-
-CMD ["node", "dist/index.js"] 
+# Start the application
+CMD ["npm", "start"] 
