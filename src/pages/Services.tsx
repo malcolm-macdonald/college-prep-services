@@ -1,16 +1,52 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { BookOpen, GraduationCap, Book, CheckCircle2 } from 'lucide-react';
+import { BookOpen, GraduationCap, Book, CheckCircle2, ChevronDown, Timer, MonitorPlay } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const Services = () => {
+  const collegeAppRef = useRef<HTMLDivElement>(null);
+  const satPrepRef = useRef<HTMLDivElement>(null);
+  const tutoringRef = useRef<HTMLDivElement>(null);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    // Handle scroll on mount and when hash changes
+    const hash = location.hash;
+    if (hash) {
+      setTimeout(() => {
+        const targetRef = 
+          hash === '#college-counseling' ? collegeAppRef :
+          hash === '#sat-prep' ? satPrepRef :
+          hash === '#tutoring' ? tutoringRef :
+          null;
+
+        if (targetRef?.current) {
+          const yOffset = -100; // Offset for fixed header
+          const y = targetRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, [location]);
+
   const serviceFeatures = [
     {
-      title: "College Application Help",
+      title: "College Application Counseling",
       description: "Receive expert support for essays, scholarships, and finding the perfect college fit just for you!",
       icon: <GraduationCap size={32} />,
+      ref: collegeAppRef,
+      id: "college-counseling",
       features: [
         "Personalized college selection strategy",
         "Application timeline management",
@@ -18,12 +54,53 @@ const Services = () => {
         "Interview preparation",
         "Scholarship application assistance",
         "Financial aid guidance"
+      ],
+      detailedServices: [
+        {
+          title: "Essay Counseling",
+          features: [
+            "Expert Review: Have essays evaluated by experienced professionals.",
+            "Detailed Feedback: Receive constructive comments and suggestions to improve writing.",
+            "Improve Clarity: Ensure ideas are clearly communicated and effectively structured.",
+            "Polish Your Work: Get guidance on refining grammar, style, and tone.",
+            "Unlimited Review: Iterate as many times as needed, we'll work with your student on an essay until it's right."
+          ],
+          pricing: [
+            "1 Essay | $75",
+            "5 Essays | $359",
+            "10 Essays | $674"
+          ]
+        },
+        {
+          title: "Application Counseling",
+          features: [
+            "Unlimited Essay Editing: Receive ongoing expert feedback to perfect your student's college essays.",
+            "Scholarship Guidance: Get personalized assistance in finding and applying for scholarships.",
+            "College Fit Counseling: Explore and identify colleges that align with your student's goals, interests, and needs.",
+            "Monthly Meetings: Participate in regular online sessions for continuous support throughout the application process.",
+            "End-to-End Support: We're with you every step of the way until your student makes their final college decision."
+          ],
+          pricing: ["$899"]
+        },
+        {
+          title: "Total College Counseling",
+          features: [
+            "Application Counseling: Includes everything from Application Counseling plus more.",
+            "Unlimited Mock Interviews: Practice and perfect interview skills with expert-led sessions.",
+            "College Tour Navigation: Receive guidance on how to make the most of college visits, including what to look for and questions to ask.",
+            "Application Success Seminar: Attend a comprehensive seminar designed to teach strategies for excelling on any application, college or professional.",
+            "Comprehensive Support: Get all the tools and advice needed to confidently navigate the college admissions process."
+          ],
+          pricing: ["$1499"]
+        }
       ]
     },
     {
       title: "SAT Prep Classes",
-      description: "Join one of our SAT prep classes for expert guidance, practice tests, and strategies to boost your score and confidence!",
+      description: "Unlock your potential with our SAT prep classes. Choose between a fast-paced class to prepare on a short timeframe or an extended program to reach mastery on the SAT. Both courses enhance your student's learning with small-group classes. Our expert instructors provide engaging lessons and practice tests that build confidence and open doors to your student's dream college! Learn more about our SAT Prep courses below.",
       icon: <BookOpen size={32} />,
+      ref: satPrepRef,
+      id: "sat-prep",
       features: [
         "Comprehensive content review",
         "Test-taking strategies",
@@ -31,27 +108,45 @@ const Services = () => {
         "Personalized study plans",
         "Regular progress assessments",
         "Small group and individual sessions"
+      ],
+      detailedServices: [
+        {
+          title: "SAT Crash Course Class",
+          features: [
+            "Unlock Mastery: 10+ hours of lessons and practice covering every type of question on the SAT.",
+            "Instructor-Led Classes: Includes 4 small-group classes delivered in-person or online, allowing for personalized instruction, interactive learning, and an enriching learning community.",
+            "One-on-One Checkpoints: Personalized meetings with an instructor to get tailored SAT tutoring and address specific needs.",
+            "Condensed Course: The perfect course for a tight schedule or a quick turnaround between consecutive SATs.",
+            "Trial Period: Try out the first two class sessions risk free. A full refund will be issued if your student doesn't wish to finish the course."
+          ],
+          pricing: ["$288"]
+        },
+        {
+          title: "SAT Mastery Class",
+          features: [
+            "Unlock Mastery: 17+ hours of lessons and practice covering every type of question on the SAT.",
+            "Instructor-Led Classes: Includes 7 small-group classes delivered in-person or online, allowing for personalized instruction, interactive learning, and an enriching learning community.",
+            "One-on-One Checkpoints: Personalized meetings with an instructor to get tailored SAT tutoring and address specific needs.",
+            "Flexible Scheduling: Easily sign up for class times that fit your family's schedule, so your student can learn when it's most convenient.",
+            "Trial Period: Try out the first two class sessions risk free. A full refund will be issued if your student doesn't wish to finish the course."
+          ],
+          pricing: ["$489"]
+        }
       ]
     },
     {
       title: "Individual Tutoring",
-      description: "Get personalized 1-on-1 tutoring for high school courses to tackle homework and improve your grades, online or in-person!",
+      description: "Subject-Specific Expertise: Get matched with a tutor who specializes in the high school course material your student needs help with.",
       icon: <Book size={32} />,
+      ref: tutoringRef,
+      id: "tutoring",
       features: [
-        "Customized learning plans",
-        "Subject-specific expertise",
-        "Homework help and review",
-        "Exam preparation",
-        "Study skills development",
-        "Regular progress reports"
+        "Personalized Tutoring: Sessions are tailored to your student's unique learning style and academic goals.",
+        "Flexible Online Meetings: Convenient 1-on-1 tutoring sessions held online, fitting easily into your family's schedule.",
+        "Comprehensive Support: Whether your student needs help with homework, exam prep, or mastering complex concepts, we've got them covered.",
+        "Starting at $87/hour"
       ]
     }
-  ];
-
-  const areasServed = [
-    "Arapahoe County", "Centennial", "Cherry Creek", "Douglas County", 
-    "Englewood", "Greenwood Village", "Highlands Ranch", "Littleton", 
-    "Lone Tree", "Parker", "Roxborough Park"
   ];
 
   const coursesTutored = [
@@ -61,6 +156,14 @@ const Services = () => {
     "Chemistry (Honors or Standard)", "AP Chemistry", "Organic Chemistry",
     "Biology (Honors or Standard)", "AP Biology"
   ];
+
+  const scrollToService = (ref: React.RefObject<HTMLDivElement>) => {
+    if (ref.current) {
+      const yOffset = -100; // Offset for fixed header
+      const y = ref.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -80,6 +183,22 @@ const Services = () => {
               <p className="text-lg text-brand-dark/80 leading-relaxed mb-8">
                 We provide top-notch college prep services that empower students to excel. From personalized SAT tutoring to expert college essay guidance, we're here to help you navigate the journey to your dream school with confidence and ease.
               </p>
+              
+              {/* Service Quick Links */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                {serviceFeatures.map((service) => (
+                  <Button
+                    key={service.id}
+                    onClick={() => scrollToService(service.ref)}
+                    className="bg-[rgb(87,155,142)] hover:bg-[rgb(87,155,142)]/90 text-white border-none shadow-sm flex items-center gap-2"
+                  >
+                    <div className="text-white">
+                      {service.icon}
+                    </div>
+                    <span>{service.title}</span>
+                  </Button>
+                ))}
+              </div>
             </motion.div>
           </div>
         </section>
@@ -91,8 +210,13 @@ const Services = () => {
               {serviceFeatures.map((service, index) => (
                 <div 
                   key={service.title}
-                  className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${
+                  ref={service.ref}
+                  id={service.id}
+                  className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-start ${
                     index % 2 === 1 ? 'lg:grid-flow-dense' : ''
+                  } ${
+                    index === 0 ? 'pb-12 border-b-2 border-[rgb(87,155,142)]' : 
+                    index === 1 ? 'pb-12 border-b-2 border-[rgb(87,155,142)]' : 'pb-0'
                   }`}
                 >
                   <motion.div
@@ -115,13 +239,15 @@ const Services = () => {
                         </li>
                       ))}
                     </ul>
-                    <div className="pt-4">
-                      <Button asChild className="rounded-full px-6 bg-brand-teal hover:bg-brand-teal/90 text-white">
-                        <Link to="/schedule">
-                          Schedule a Session
-                        </Link>
-                      </Button>
-                    </div>
+                    {service.title !== "College Application Counseling" && service.title !== "SAT Prep Classes" && (
+                      <div className="pt-4">
+                        <Button asChild className="rounded-full px-6 bg-[rgb(87,155,142)] hover:bg-[rgb(87,155,142)]/90 text-white">
+                          <Link to="/schedule">
+                            Schedule a Free Consultation
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
                   </motion.div>
 
                   <motion.div
@@ -143,46 +269,84 @@ const Services = () => {
                       className="rounded-2xl shadow-lg w-full h-full object-cover"
                     />
                   </motion.div>
+
+                  {/* Detailed Services Accordion */}
+                  {service.detailedServices && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      className="col-span-1 lg:col-span-2 -mt-4"
+                    >
+                      <Accordion type="single" collapsible className="w-full space-y-4">
+                        {service.detailedServices.map((detailedService, idx) => (
+                          <AccordionItem 
+                            key={idx} 
+                            value={`item-${idx}`}
+                            className="border border-gray-200 rounded-lg overflow-hidden hover:border-brand-teal/30 transition-colors"
+                          >
+                            <AccordionTrigger className="px-6 py-4 hover:bg-gray-50/50">
+                              <div className="flex items-center gap-4">
+                                {service.title === "SAT Prep Classes" ? (
+                                  detailedService.title === "SAT Crash Course Class" ? (
+                                    <Timer size={24} className="text-brand-teal" />
+                                  ) : (
+                                    <MonitorPlay size={24} className="text-brand-teal" />
+                                  )
+                                ) : (
+                                  idx === 0 ? (
+                                    <BookOpen size={24} className="text-brand-teal" />
+                                  ) : idx === 1 ? (
+                                    <GraduationCap size={24} className="text-brand-teal" />
+                                  ) : (
+                                    <Book size={24} className="text-brand-teal" />
+                                  )
+                                )}
+                                <h3 className="text-2xl font-semibold text-brand-dark">
+                                  {detailedService.title}
+                                </h3>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-6 pb-6">
+                              <div className="space-y-6">
+                                <ul className="space-y-3">
+                                  {detailedService.features.map((feature, featureIdx) => (
+                                    <li key={featureIdx} className="flex items-start">
+                                      <CheckCircle2 size={18} className="text-brand-teal mt-1 mr-3 flex-shrink-0" />
+                                      <span className="text-lg text-brand-dark/80">{feature}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                                <div className="space-y-2">
+                                  {detailedService.pricing.map((price, priceIdx) => (
+                                    <p key={priceIdx} className="text-xl font-semibold text-brand-teal">
+                                      {price}
+                                    </p>
+                                  ))}
+                                </div>
+                                {service.title !== "SAT Prep Classes" && (
+                                  <Button asChild className="rounded-full px-6 bg-[rgb(87,155,142)] hover:bg-[rgb(87,155,142)]/90 text-white">
+                                    <Link to="/schedule">
+                                      Schedule a Free Consultation
+                                    </Link>
+                                  </Button>
+                                )}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    </motion.div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Areas We Serve Section */}
-        <section className="py-20 bg-brand-light">
-          <div className="container px-6 mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true, amount: 0.3 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Areas We Serve</h2>
-              <p className="text-lg text-brand-dark/70 max-w-2xl mx-auto">
-                We offer our services throughout the greater Denver metropolitan area, including:
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              viewport={{ once: true, amount: 0.3 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center max-w-4xl mx-auto"
-            >
-              {areasServed.map((area) => (
-                <div key={area} className="bg-white rounded-xl p-4 shadow-sm">
-                  <span className="font-medium text-brand-dark">{area}</span>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
         {/* Courses We Tutor Section */}
-        <section className="py-20 bg-white">
+        <section className="pt-8 pb-20 bg-white">
           <div className="container px-6 mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -220,6 +384,26 @@ const Services = () => {
                 </motion.div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Referral Promotion Section */}
+        <section className="py-16 bg-[rgb(87,155,142)] mb-12">
+          <div className="container px-6 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true, amount: 0.3 }}
+              className="text-center text-white"
+            >
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4 text-white">
+                Get 10% Back for Every Friend You Recommend*
+              </h2>
+              <p className="text-xs text-white/90">
+                *Up to a 50% total refund/discount. Recommended friends must sign up and pay before refunds are issued.
+              </p>
+            </motion.div>
           </div>
         </section>
 
