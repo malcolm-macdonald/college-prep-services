@@ -3,12 +3,16 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && cd server && npm run build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "start": "vite preview --host --port $PORT"
+    "start": "cd server && npm run start:prod",
+    "postinstall": "cd server && npm install"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.1.2",
@@ -38,6 +42,8 @@
     "@radix-ui/react-toggle": "^1.0.3",
     "@radix-ui/react-toggle-group": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@stripe/react-stripe-js": "^3.6.0",
+    "@stripe/stripe-js": "^7.2.0",
     "@tanstack/react-query": "^5.24.1",
     "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",

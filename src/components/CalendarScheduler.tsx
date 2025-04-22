@@ -9,9 +9,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getAvailableTimeSlots, createAppointment, AppointmentData } from '@/services/calendarService';
-import SatPrepScheduler from './SatPrepScheduler';
+import { SatPrepScheduler } from './SatPrepScheduler';
+import { PaymentForm } from './PaymentForm';
 
-type Step = 'date-time' | 'form' | 'confirmation';
+type Step = 'date-time' | 'form' | 'review' | 'payment' | 'confirmation';
 
 interface FormData {
   studentName: string;
@@ -57,9 +58,17 @@ const CalendarScheduler = () => {
   ];
 
   useEffect(() => {
-    if (date) {
+    // Skip this effect entirely when in review or confirmation steps
+    if (!date || step === 'review' || step === 'confirmation') {
+      return;
+    }
+    
       setLoading(true);
+    
+    // Always clear selected time when changing dates in the date-time step
+    if (step === 'date-time') {
       setSelectedTime(null);
+    }
       
       // Format date as YYYY-MM-DD
       const formattedDate = date.toISOString().split('T')[0];
@@ -91,10 +100,7 @@ const CalendarScheduler = () => {
         .finally(() => {
           setLoading(false);
         });
-    } else {
-      setTimeSlots([]);
-    }
-  }, [date, formData.serviceType, toast]);
+  }, [date, formData.serviceType, toast, step]); // Added step to dependencies
 
   const handleDateSelect = (date: Date | undefined) => {
     setDate(date);
@@ -114,6 +120,26 @@ const CalendarScheduler = () => {
       return;
     }
 
+    // Instead of creating appointment, move to review step
+    setStep('review');
+  };
+
+  const handleProceedToPayment = () => {
+    // Move to payment step
+    setStep('payment');
+  };
+
+  const handleConfirmAppointment = () => {
+    if (!date || !selectedTime) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a date and time for your appointment",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // After payment is completed, we'll create the appointment
     setLoading(true);
     const appointmentData: AppointmentData = {
       date: date,
@@ -130,11 +156,18 @@ const CalendarScheduler = () => {
     
     createAppointment(appointmentData)
       .then(response => {
+        // Create a local copy of the time to avoid any state issues
+        const confirmedTime = selectedTime;
+        console.log(`Setting booking confirmation with time: ${confirmedTime}`);
+        
+        // Set the booking confirmation with the local copy of time
         setBookingConfirmation({
           date: new Date(date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
-          time: selectedTime,
+          time: confirmedTime,
           serviceType: formData.serviceType === 'private-tutoring' 
             ? 'Private Tutoring' 
+            : formData.serviceType === 'sat-prep'
+              ? 'SAT Preparation'
             : 'College Application Help',
           eventId: response.eventId
         });
@@ -156,6 +189,10 @@ const CalendarScheduler = () => {
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  const handlePaymentComplete = () => {
+    handleConfirmAppointment();
   };
 
   const handleBackToForm = () => {
@@ -235,6 +272,15 @@ const CalendarScheduler = () => {
     setBookingConfirmation(null);
   };
 
+  const handleConfirmation = (selectedDate: Date, selectedTimeSlot: string) => {
+    // Store the selected date and time
+    console.log(`SatPrepScheduler selected time: ${selectedTimeSlot}`);
+    setDate(selectedDate);
+    setSelectedTime(selectedTimeSlot);
+    // Move to review step
+    setStep('review');
+  };
+
   const renderTimeSlots = () => {
     if (loading) {
       return (
@@ -253,12 +299,12 @@ const CalendarScheduler = () => {
     }
 
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-96 overflow-y-auto p-2">
         {timeSlots.map((time, index) => (
           <Button
             key={index}
             variant={selectedTime === time ? "default" : "outline"}
-            className="w-full"
+            className="w-full min-h-[3.5rem] py-3 px-4 whitespace-normal text-sm flex items-center justify-center text-center break-words"
             onClick={() => handleTimeSelect(time)}
           >
             {time}
@@ -268,42 +314,19 @@ const CalendarScheduler = () => {
     );
   };
 
-  if (step === 'confirmation' && bookingConfirmation) {
-    return (
-      <Card className="w-full max-w-3xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Appointment Confirmed!</CardTitle>
-          <CardDescription className="text-center">We look forward to meeting with you</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="bg-primary/10 p-6 rounded-lg space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Date:</span>
-              <span>{bookingConfirmation.date}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Time:</span>
-              <span>{bookingConfirmation.time}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Service:</span>
-              <span>{bookingConfirmation.serviceType}</span>
-            </div>
-          </div>
-          
-          <div className="space-y-3 text-center">
-            <p>A confirmation email has been sent to your email address.</p>
-            <p>If you need to make any changes to your appointment, please contact us directly.</p>
-          </div>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <Button onClick={handleStartNewBooking}>Book Another Appointment</Button>
-        </CardFooter>
-      </Card>
-    );
-  }
+  const renderCurrentStep = () => {
+    if (formData.serviceType === 'sat-prep' && step === 'date-time') {
+      return <SatPrepScheduler 
+        onBack={handleBackToForm}
+        onComplete={(selectedDate: Date, selectedTimeSlot: string) => {
+          handleConfirmation(selectedDate, selectedTimeSlot);
+        }}
+      />;
+    }
 
-  if (step === 'form') {
+    switch (step) {
+      case 'form':
+        // Form Step rendering
     return (
       <Card className="w-full max-w-3xl mx-auto">
         <CardHeader>
@@ -446,57 +469,8 @@ const CalendarScheduler = () => {
         </CardFooter>
       </Card>
     );
-  }
-
-  if (step === 'date-time') {
-    if (formData.serviceType === 'sat-prep') {
-      return (
-        <SatPrepScheduler 
-          onBack={handleBackToForm}
-          onComplete={(selectedDate, selectedTime) => {
-            setLoading(true);
-            const appointmentData: AppointmentData = {
-              date: selectedDate,
-              timeSlot: selectedTime,
-              studentName: formData.studentName,
-              parentName: formData.parentName || undefined,
-              email: formData.email,
-              phone: formData.phone,
-              serviceType: 'sat-prep',
-              notes: formData.notes || undefined
-            };
-            
-            createAppointment(appointmentData)
-              .then(response => {
-                setBookingConfirmation({
-                  date: new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
-                  time: selectedTime,
-                  serviceType: 'SAT Preparation',
-                  eventId: response.eventId
-                });
-                setStep('confirmation');
-                toast({
-                  title: "SAT Prep Session Scheduled",
-                  description: "Your SAT preparation session has been successfully scheduled!",
-                  variant: "default"
-                });
-              })
-              .catch(error => {
-                console.error('Error creating appointment:', error);
-                toast({
-                  title: "Booking Failed",
-                  description: "Failed to book your session. Please try again.",
-                  variant: "destructive"
-                });
-              })
-              .finally(() => {
-                setLoading(false);
-              });
-          }}
-        />
-      );
-    }
-
+      case 'date-time':
+        // Date and Time selection step
     return (
       <Card className="w-full max-w-3xl mx-auto">
         <CardHeader>
@@ -532,7 +506,196 @@ const CalendarScheduler = () => {
         </CardFooter>
       </Card>
     );
-  }
+      case 'review':
+        // Get service type display name
+        const serviceTypeDisplay = formData.serviceType === 'private-tutoring'
+          ? 'Private Tutoring'
+          : formData.serviceType === 'sat-prep'
+            ? 'SAT Preparation'
+            : 'College Application Help';
+        
+        // Format the date for display
+        const formattedDate = date ? new Date(date).toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        }) : '';
+        
+        // Get course name if applicable
+        let courseName = '';
+        if (formData.serviceType === 'private-tutoring' && formData.course) {
+          // Convert from kebab-case to display name (e.g., "algebra-1" to "Algebra I")
+          const courseMap: Record<string, string> = {
+            'algebra-1': 'Algebra I',
+            'algebra-2': 'Algebra II',
+            'geometry': 'Geometry',
+            'trigonometry': 'Trigonometry',
+            'precalculus': 'Precalculus',
+            'ap-calc-ab': 'AP Calculus AB (I)',
+            'ap-calc-bc': 'AP Calculus BC (II)',
+            'physics': 'Physics (Honors or Standard)',
+            'ap-physics-1-2': 'AP Physics 1 and 2 (Algebra Based)',
+            'ap-physics-c': 'AP Physics C (Calculus Based)',
+            'chemistry': 'Chemistry (Honors or Standard)',
+            'ap-chemistry': 'AP Chemistry',
+            'organic-chemistry': 'Organic Chemistry',
+            'biology': 'Biology (Honors or Standard)',
+            'ap-biology': 'AP Biology'
+          };
+          courseName = courseMap[formData.course] || formData.course;
+        }
+        
+        // Review and confirm step
+        return (
+          <Card className="w-full max-w-3xl mx-auto">
+            <CardHeader>
+              <CardTitle className="text-xl">Review Your Appointment</CardTitle>
+              <CardDescription>Please review the details of your appointment before proceeding to payment</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="bg-primary/10 p-6 rounded-lg space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Service Type:</span>
+                    <span>{serviceTypeDisplay}</span>
+                  </div>
+                  
+                  {courseName && (
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Course:</span>
+                      <span>{courseName}</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Date:</span>
+                    <span>{formattedDate}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Time:</span>
+                    <span>{selectedTime || 'Time not specified'}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center font-bold mt-4 pt-4 border-t border-primary/20">
+                    <span>Price:</span>
+                    <span className="text-lg">$9,999.00</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Your Name:</span>
+                    <span>{formData.studentName}</span>
+                  </div>
+                  
+                  {formData.parentName && (
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Parent/Guardian:</span>
+                      <span>{formData.parentName}</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Email:</span>
+                    <span>{formData.email}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Phone:</span>
+                    <span>{formData.phone}</span>
+                  </div>
+                </div>
+                
+                {formData.notes && (
+                  <div className="space-y-2">
+                    <h3 className="font-medium">Additional Notes:</h3>
+                    <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded">{formData.notes}</p>
+                  </div>
+                )}
+                
+                {formData.applicationMaterials && formData.applicationMaterials.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="font-medium">Uploaded Materials:</h3>
+                    <ul className="text-sm list-disc pl-5">
+                      {Array.from(formData.applicationMaterials).map((file, index) => (
+                        <li key={index}>{file.name} ({Math.round(file.size / 1024)} KB)</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button 
+                variant="outline" 
+                onClick={() => setStep('date-time')}
+              >
+                Back
+              </Button>
+              <Button 
+                onClick={handleProceedToPayment}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Proceed to Payment'
+                )}
+              </Button>
+            </CardFooter>
+          </Card>
+        );
+      case 'payment':
+        return (
+          <PaymentForm 
+            onBack={() => setStep('review')}
+            onComplete={handlePaymentComplete}
+            serviceType={formData.serviceType}
+          />
+        );
+      case 'confirmation':
+        // Success confirmation step
+        return (
+          <Card className="w-full max-w-3xl mx-auto">
+            <CardHeader>
+              <CardTitle className="text-2xl text-center">Appointment Confirmed!</CardTitle>
+              <CardDescription className="text-center">We look forward to meeting with you</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="bg-primary/10 p-6 rounded-lg space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Date:</span>
+                  <span>{bookingConfirmation?.date}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Time:</span>
+                  <span>{bookingConfirmation?.time}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Service:</span>
+                  <span>{bookingConfirmation?.serviceType}</span>
+                </div>
+              </div>
+              
+              <div className="space-y-3 text-center">
+                <p>A confirmation email has been sent to your email address.</p>
+                <p>If you need to make any changes to your appointment, please contact us directly.</p>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-center">
+              <Button onClick={handleStartNewBooking}>Book Another Appointment</Button>
+            </CardFooter>
+          </Card>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -541,32 +704,8 @@ const CalendarScheduler = () => {
         <CardDescription>Select a date and time that works for you</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold mb-4">Select a Date & Time</h3>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={handleDateSelect}
-              disabled={disabledDays}
-              className="rounded-md border shadow"
-            />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-medium mb-3">Available Time Slots</h3>
-            {renderTimeSlots()}
-          </div>
-        </div>
+        {renderCurrentStep()}
       </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={handleNextStep} 
-          disabled={!date || !selectedTime} 
-          className="ml-auto"
-        >
-          Continue
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

@@ -4,9 +4,11 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "ts-node-dev --transpile-only src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "start:prod": "node src/server.js",
+    "test-server": "node src/test-server.js",
     "copy-frontend": "mkdir -p ./dist/public && cp -r ../dist/* ./dist/public/",
     "postbuild": "npm run copy-frontend"
   },
@@ -19,11 +21,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-validator": "^7.2.1",
     "googleapis": "^148.0.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.2",
     "nodemailer": "^6.10.0",
-    "prisma": "^6.5.0"
+    "prisma": "^6.5.0",
+    "stripe": "^18.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

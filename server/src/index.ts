@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import availabilityRoutes from './routes/availabilityRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -27,8 +28,8 @@ console.log('Environment:', process.env.NODE_ENV || 'development');
 console.log('Current directory:', __dirname);
 console.log('Static files path:', DIST_PATH);
 
-// Serve static files from the React app
-app.use(express.static(DIST_PATH));
+// API Routes
+app.use('/api/availability', availabilityRoutes);
 
 // Basic health check route
 app.get('/api/health', (req, res) => {
@@ -40,6 +41,9 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
   next();
 });
+
+// Serve static files from the React app
+app.use(express.static(DIST_PATH));
 
 // Handle SPA routing - this should be after all API routes
 app.get('*', (req, res) => {

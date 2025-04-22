@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import appointmentRoutes from './routes/appointments';
+import appointmentRoutes from './routes/appointments.js';
+import availabilityRoutes from './routes/availabilityRoutes.js';
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(morgan('dev'));
 
 // Routes
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/availability', availabilityRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

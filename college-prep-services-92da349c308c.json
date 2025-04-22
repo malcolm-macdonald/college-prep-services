@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "college-prep-services",
+  "private_key_id": "92da349c308cb8f63989de3c49cf48fbd0472103",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCeNSBO4BUnDguB\nx2FnLr+PlGHUpnPtu7KtULU+Z30oW+ti7y9FXUYXq7RF0A/F9P+DIxeh4QWuP5hk\nS6TLy2uuGuu//eNd04ROquExW7ttEVX+t/LOY+plVcY/8Xw9LzQKRU9RVf+8ARdH\npTyhzsAxi6fHBYdacyb7wvvvFAZSLfpSDCNo2sF06JaaL2zECjLXL+tigaTTRpNu\nnuIYIFDwjxqUG3w+byOoft/07greLVqTikVTZyRviH/0jyyNul0Duiry0XHtA7eP\n0a1FuQoLgwGHwr2hYNOhbNhaEC54heMm0Qgck8xdllaG6NBWteW7XaSOoREIkxxr\n3PhPRwCZAgMBAAECggEAF5+I1049dQCeC5Rea8j+te1ASGpMZYNWlEDjYfyTozBK\nhGeA+vizq9Ap5xdra4cq6gVrlMfkEGyS5ZL9T1LsyBQL/2CP5TrdXDPG1Bca9EJs\n6/ptSTqBIv18+0pPNKxKNyhkm26zH3sC42H9x47MLaRpT934Toi4REqNUi8pccwL\nSN0xyJaxiyzJWygpcbC8gzO/P77bcLCfceFqAe49zJGcpz1gQOhb668jHJkik5tg\ncWJxokZahVvWLZqhreuVc1XF8AGN3ReND76XHKePjzka4vajA4ZcMtdYybquCG8u\nK5Xj5hDsB63+4waja2sQcdU+vfj1DnAcv123BmDQawKBgQDPeYJrqVy7P4W9IfIx\n9hK8JSQM0K2fd8wa+VQXD2wTFWjOgjN1oY0oELIwd2X3ZUNObX1z29Xl29iR4Z0z\nrkXPn8gL8xaP0Wkd3funpGCHQpHTkABMa9UVsFL36ILtUWbPm8WCe0IIJCDjS2cQ\nGbLef1OFmYNCJKi0ilHKAx/AnwKBgQDDNcK3lWoCGJnoRgUMQrX5jzmAvvycyOjV\nM1mldpRTDz7ofG4gvVBtXOKXYuBiWi535D4WFGg+WnTnGXfsORhjgowlRkM+H2vS\nYW7OWgCPD0u8HLgR/YONZE0NMoqP1ea5cdDzFxffDtABqnKP3LZCm6IF3TWfOYQv\nHkEAfQibxwKBgQCBxI91hW3x1G5y+KuC4lWfhl+BAHjIOGbaLD6TWdsQKKDwIXHM\nTmp6t86sD9IgJh8uC7+e2s5zwck4nXP04jjZ/ydhif7/n0xvGOwRU/foQhPxzqzR\nH9UchreuRai2hOaYTecAkNWhP++uGvhwkpJVJjB4bKczlLhMjANSJhgTIwKBgD7F\ngNGr2CTIaGVKbsEciouvRJxjzbNU35n/IyqT0OpMkrwLlxYsCjrAjZSElQbLXPns\niRJsiYDTcZgGlot9aJxHFG3ABEtrqy5BanIsetWF46Kf0Yjnbm/++s/tmqTZ8ZFc\nSgaBPInbp4OBncko/eq5RQaBtYZ35kuIfPp9OlFtAoGBALGuCdvNjv2ObpYkWFmA\nwNFrNaO5SJJ3XQOVTGq+E5wok89uBIokn87rjEhrEawVkE2yYQVbAXU8iIEoS1Wc\n0xZnwPgCSgsKEQbX8z9pAGtEVd1L9hyzWkHCXmUitONoqmbqCvnOoeKWq+Il0eCi\nT9Tp9negfZWHFz9+dIS5eeRp\n-----END PRIVATE KEY-----\n",
+  "client_email": "college-prep-calendar@college-prep-services.iam.gserviceaccount.com",
+  "client_id": "109235847887332806274",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/college-prep-calendar%40college-prep-services.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
