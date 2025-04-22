@@ -11,7 +11,7 @@
     "build": "tsc && vite build && mkdir -p server/dist && cp -r dist server/dist/public",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "start": "node server/src/server.js",
+    "start": "NODE_ENV=production node --unhandled-rejections=strict server/src/server.js",
     "postinstall": "if [ -d \"server\" ]; then cd server && npm install; fi"
   },
   "dependencies": {
